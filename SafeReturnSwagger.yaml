@@ -42,6 +42,7 @@ paths:
               properties:
                 type:
                   type: string
+                  description: Type de déclaration (perte ou découverte)
                   enum: [lost, found]
                 animalDetails:
                   type: object
@@ -49,42 +50,63 @@ paths:
                   properties:
                     species:
                       type: string
+                      description: L'espéce de l'animal
                       enum: [cat, dog, rabbit, bird, snake, tiger, lion, hamster, mouse, other]
                     breed:
+                      description: La race précise de l'animal
                       type: string
                     color:
+                      description: Les différentes couleurs de l'animal
                       type: array
                       items:
                         type: string
                     weight:
+                      description: Le poids de l'animal en Kg.
                       type: number
                       format: float
                     size:
-                      type: string
+                      description: La taille de l'animal en centimètres. La taille est la hauteur de l'animal dans sa position naturelle (sur les 4 pattes pour un chien par exemple).
+                      type: number
+                      format: float
                     age:
-                      type: string
+                      description: L'age de l'animal en age humain, c'est-à-dire le nombre d'années écoulées depuis sa naissance.
+                      type: integer
+                      format: int64
                 location:
-                  type: string
+                  type: object
+                  properties: 
+                    latitude: 
+                      type: number
+                      format: double
+                    longitude: 
+                      type: number
+                      format: double
+                  description: Localisation de la perte ou découverte
                 photo:
                   type: string
                   format: uri
-                token:
-                  type: string
+                  description: Photo de l'objet ou animal
+                reward:
+                  type: integer
+                  format: int64
+                  description: Récompense proposée
                 status:
                   type: string
                   enum: [active, resolved]
               example:
+                id: 45
                 type: lost
                 animalDetails:
                   species: dog
                   breed: labrador
                   color: [black, white]
-                  weight: 30
-                  size: medium
-                  age: 3 years
-                location: Paris, France
+                  weight: 10
+                  size: 64
+                  age: 3
+                location: 
+                  latitude: 48.866667
+                  longitude: 2.333333
                 photo: https://example.com/photos/dog.jpg
-                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
                 status: active
           
       responses:
@@ -97,19 +119,19 @@ paths:
               examples:
                 exempleReponse:
                   value:
-                    id: 123
+                    id: 45
                     type: lost
                     animalDetails:
                       species: dog
                       breed: labrador
-                      color:
-                        - black
-                      weight: 30
-                      size: medium
-                      age: 3 years
-                    location: Paris, France
+                      color: [black, white]
+                      weight: 10
+                      size: 64
+                      age: 3
+                    location: 
+                      latitude: 48.866667
+                      longitude: 2.333333
                     photo: https://example.com/photos/dog.jpg
-                    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
                     status: active
         '400':
           description: Données invalides
@@ -221,6 +243,7 @@ paths:
               properties:
                 type:
                   type: string
+                  description: Type de déclaration (perte ou découverte)
                   enum: [lost, found]
                 animalDetails:
                   type: object
@@ -228,42 +251,63 @@ paths:
                   properties:
                     species:
                       type: string
+                      description: L'espéce de l'animal
                       enum: [cat, dog, rabbit, bird, snake, tiger, lion, hamster, mouse, other]
                     breed:
+                      description: La race précise de l'animal
                       type: string
                     color:
+                      description: Les différentes couleurs de l'animal
                       type: array
                       items:
                         type: string
                     weight:
+                      description: Le poids de l'animal en Kg.
                       type: number
                       format: float
                     size:
-                      type: string
+                      description: La taille de l'animal en centimètres. La taille est la hauteur de l'animal dans sa position naturelle (sur les 4 pattes pour un chien par exemple).
+                      type: number
+                      format: float
                     age:
-                      type: string
+                      description: L'age de l'animal en age humain, c'est-à-dire le nombre d'années écoulées depuis sa naissance.
+                      type: integer
+                      format: int64
                 location:
-                  type: string
+                  type: object
+                  properties: 
+                    latitude: 
+                      type: number
+                      format: double
+                    longitude: 
+                      type: number
+                      format: double
+                  description: Localisation de la perte ou découverte
                 photo:
                   type: string
                   format: uri
-                token:
-                  type: string
+                  description: Photo de l'objet ou animal
+                reward:
+                  type: integer
+                  format: int64
+                  description: Récompense proposée
                 status:
                   type: string
                   enum: [active, resolved]
               example:
+                id: 45
                 type: lost
                 animalDetails:
                   species: dog
                   breed: labrador
                   color: [black, white]
-                  weight: 30
-                  size: medium
-                  age: 3 years
-                location: Paris, France
+                  weight: 10
+                  size: 64
+                  age: 3
+                location: 
+                  latitude: 48.866667
+                  longitude: 2.333333
                 photo: https://example.com/photos/dog.jpg
-                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
                 status: active
       responses:
         '200':
@@ -490,7 +534,7 @@ paths:
       tags:
         - payments
       summary: Obtenir un paiement
-      description: Récupère les informations d'un paiement à partir de son ID.
+      description: Récupère les informations d'un paiement à partir de son ID de correlation.
       operationId: getPaymentById
       security:
         - bearerAuth: []
@@ -521,7 +565,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: ID du paiement à supprimer
+          description: ID de correlation du paiement à supprimer
           required: true
           schema:
             type: integer
@@ -544,7 +588,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: ID du paiement à mettre à jour
+          description: ID de correlation du paiement à mettre à jour
           required: true
           schema:
             type: integer
@@ -558,6 +602,7 @@ paths:
               properties:
                 amount:
                   type: number
+                  format: float
                 currency:
                   type: string
                   example: "Yen"
@@ -573,7 +618,38 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Payments'
+                type: object
+                properties:
+                  rewarderId:
+                    type: integer
+                    description: Id of the user who posted the declaration
+                  receiverId:
+                    type: integer
+                    description: Id of the user who received the declaration's reward
+                  correlationId:
+                    type: integer
+                    description: Id given by the client that describes a unique transaction
+                  amount:
+                    type: number
+                    format: float
+                    description: Sum of the transaction
+                  currency:
+                    type: string
+                    description: Currency of the transaction (dollar, euro, etc...)
+                  method:
+                    type: string
+                    enum: [credit_card, paypal, bank_transfer]
+                  status:
+                    type: string
+                    enum: [success, failed]
+                example:
+                  rewarderId: 40
+                  receiverId: 52
+                  correlationId: 111111
+                  amount: 0
+                  currency: "Yen"
+                  method: "credit_card"
+                  status: "success"
         '400':
           description: Données invalides
         '404':
