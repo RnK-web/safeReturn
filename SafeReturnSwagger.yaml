@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: SafeReturn API
   description: |-
-    SafeReturn est une application conçue pour centraliser les déclarations d'animaux ou d'objets perdus/trouvés. Elle facilite la recherche avec des fonctionnalités de géolocalisation, filtres personnalisés, notifications instantanées, gestion de récompenses et communication directe entre propriétaires et chercheurs.
+    SafeReturn est une application conçue pour centraliser les déclarations d'animaux perdus/trouvés. Elle facilite la recherche avec des fonctionnalités de géolocalisation, filtres personnalisés, notifications instantanées, gestion de récompenses et communication directe entre propriétaires et chercheurs.
     
     
      ## Description des endpoints :
@@ -30,10 +30,10 @@ paths:
       tags:
         - declarations
       summary: Créer une déclaration de perte
-      description: Permet aux propriétaires de déclarer un animal ou objet perdu.
+      description: Permet aux propriétaires de déclarer un animal perdu.
       operationId: createDeclaration
       requestBody:
-        description: Informations sur l'animal ou l'objet perdu
+        description: Informations sur l'animal perdu
         required: true
         content:
           application/json:
@@ -85,7 +85,7 @@ paths:
                 photo:
                   type: string
                   format: uri
-                  description: Photo de l'objet ou animal
+                  description: Photo de l'animal
                 reward:
                   type: integer
                   format: int64
@@ -94,7 +94,6 @@ paths:
                   type: string
                   enum: [active, resolved]
               example:
-                id: 45
                 type: lost
                 animalDetails:
                   species: dog
@@ -139,7 +138,7 @@ paths:
       tags:
         - declarations
       summary: Liste des déclarations
-      description: Récupère les déclarations d'animaux ou objets perdus.
+      description: Récupère les déclarations d'animaux perdus.
       operationId: listDeclarations
       security:
         - bearerAuth: []
@@ -286,7 +285,7 @@ paths:
                 photo:
                   type: string
                   format: uri
-                  description: Photo de l'objet ou animal
+                  description: Photo de l'animal
                 reward:
                   type: integer
                   format: int64
@@ -295,7 +294,6 @@ paths:
                   type: string
                   enum: [active, resolved]
               example:
-                id: 45
                 type: lost
                 animalDetails:
                   species: dog
@@ -511,6 +509,10 @@ paths:
       responses:
         '200':
           description: Paiement réussi
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payments'
         '400':
           description: Échec du paiement
     get:
@@ -741,7 +743,7 @@ components:
         photo:
           type: string
           format: uri
-          description: Photo de l'objet ou animal
+          description: Photo de l'animal
         reward:
           type: integer
           format: int64
@@ -835,18 +837,21 @@ components:
       example:
         items: [
         {
+          id: 45,
           type: lost,
           animalDetails: {
             species: dog,
             breed: labrador,
             color: [black, white],
-            weight: 30,
-            size: medium,
-            age: 3 years
+            weight: 10,
+            size: 64,
+            age: 3
           },
-          location: "Paris, France",
+          location: {
+            latitude: 48.866667,
+            longitude: 2.333333
+          },
           photo: https://example.com/photos/dog.jpg,
-          token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
           status: active
         }
         ]
