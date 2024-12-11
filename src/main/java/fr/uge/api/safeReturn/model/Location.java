@@ -1,5 +1,8 @@
 package fr.uge.api.safeReturn.model;
 
-public record Location(Double longitude, Double latitude) {
+import jakarta.persistence.Entity;
+
+
+public record Location(double longitude, double latitude) {
 
 }

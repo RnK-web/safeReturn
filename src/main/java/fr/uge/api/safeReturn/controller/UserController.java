@@ -29,7 +29,7 @@ public class UserController {
 	}
 	
 	@PatchMapping("/v1/users/{id}")
-	public User updateUser(@PathVariable long id) {
+	public User updateUser(@PathVariable long id, @RequestBody User user) {
 		return null;
 	}
 	

@@ -5,22 +5,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
-@Table(name = "PAYMENT")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Payment {
+public record Payment (
 
-	private Long rewarderId;
-	private Long receiverId;
+	 long rewarderId,
+	 long receiverId,
+	 long correlationId,
 	
-	@Id 
-	private Long correlationId;
-	
-	private Float amount;
-	private String currency;
-	private String method;
-	private String status;
-
+	 float amount,
+	 String currency,
+	 String method,
+	 String status
+) {
 }
