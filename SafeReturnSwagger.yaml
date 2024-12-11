@@ -2,15 +2,22 @@ openapi: 3.0.3
 info:
   title: SafeReturn API
   description: |-
-    SafeReturn est une application conçue pour centraliser les déclarations d'animaux perdus/trouvés. Elle facilite la recherche avec des fonctionnalités de géolocalisation, filtres personnalisés, notifications instantanées, gestion de récompenses et communication directe entre propriétaires et chercheurs.
+    SafeReturn est une application innovante conçue pour offrir une interface centralisée, permettant aux utilisateurs de signaler et de rechercher des animaux perdus et retrouvés. L'application regroupe un ensemble d'annonces de recherche d'animaux disparus sur une seule plateforme afin de faciliter les recherches. SafeReturn intègre des fonctionnalités avancées telles que la géolocalisation, des filtres personnalisés, des notifications instantanées, la gestion des récompenses, ainsi qu'une communication directe entre les propriétaires d'animaux et les chercheurs.
+    
+    L'API de SafeReturn couvre les fonctionnalités suivantes :
+    - **Création et gestion des utilisateurs** : Cette fonctionnalité permet d'ajouter, de modifier, de supprimer et de récupérer les informations relatives aux utilisateurs de l'application..
+    - **Création et gestion de déclarations de perte d'animal** : L'API permet l'ajout, la modification, la suppression et la récupération des déclarations concernant les animaux perdus ou retrouvés, ainsi que toutes les informations associées.
+    - **Création et gestion de d'abonnement'** : Cette fonctionnalité permet aux utilisateurs de souscrire, de modifier, de résilier et de consulter les informations liées à leurs abonnements.
+    - **Authentification et autorisation** : L'API valide les identifiants des utilisateurs et gère les tokens JWT pour sécuriser les accès.
+    - **Mise en place d'un paiement** : SafeReturn permet de gérer les paiements, y compris les abonnements premium et l'historique des transactions.
     
     
      ## Description des endpoints :
-    - **/declarations** : Gère les déclarations de pertes ou de découvertes, permet de créer, consulter et rechercher des déclarations.
-    - **/users** : Gère la création et la récupération des profils utilisateurs.
-    - **/payments** : Permet de gérer les paiements, notamment les abonnements premium et les historiques des transactions.
-    - **/auth** : Permet l'authentification et la gestion des tokens.
-    
+    - **/declarations** : Ce point d'accès permet de gérer les déclarations d'animaux perdus ou retrouvés. Il offre des fonctionnalités pour créer, consulter et rechercher des déclarations d'animaux, facilitant ainsi la mise en relation des utilisateurs.
+    - **/users** : Ce point d'accès gère la création, la récupération et la modification des profils utilisateurs. Il permet de gérer les informations personnelles et les paramètres de chaque utilisateur de l'application.
+    - **/payments** : Ce point d'accès permet de gérer les paiements effectués au sein de l'application, notamment pour les abonnements premium, ainsi que pour consulter l'historique des transactions réalisées par les utilisateurs.
+    - **/subscriptions** : Ce point d'accès est dédié à la gestion des abonnements des utilisateurs de SafeReturn. Il permet de souscrire, modifier ou annuler un abonnement, ainsi que d'accéder aux informations liées à ces derniers.
+
   version: 1.0.0
 servers:
   - url: https://api.safereturn.com
@@ -21,9 +28,9 @@ tags:
   - name: users
     description: Gestion des utilisateurs et profils
   - name: payments
-    description: Paiements et abonnements
-  - name: notifications
-    description: Notifications entre utilisateurs
+    description: Gestion des paiements d'abonnement comme des récompenses
+  - name: subscriptions
+    description: Gestion des abonnements
 paths:
   /v1/declarations:
     post:
@@ -74,11 +81,11 @@ paths:
                       format: int64
                 location:
                   type: object
-                  properties: 
-                    latitude: 
+                  properties:
+                    latitude:
                       type: number
                       format: double
-                    longitude: 
+                    longitude:
                       type: number
                       format: double
                   description: Localisation de la perte ou découverte
@@ -102,13 +109,13 @@ paths:
                   weight: 10
                   size: 64
                   age: 3
-                location: 
+                location:
                   latitude: 48.866667
                   longitude: 2.333333
                 photo: https://example.com/photos/dog.jpg
                 reward: 60
                 status: active
-          
+
       responses:
         '201':
           description: Déclaration créée avec succès
@@ -128,7 +135,7 @@ paths:
                       weight: 10
                       size: 64
                       age: 3
-                    location: 
+                    location:
                       latitude: 48.866667
                       longitude: 2.333333
                     photo: https://example.com/photos/dog.jpg
@@ -166,17 +173,19 @@ paths:
           in: query
           description: Filtrer par type d'animal
           schema:
-            type: string    
+            type: string
       responses:
         '200':
           description: Liste des déclarations avec pagination
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedDeclarations'
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaginatedDeclarations'
         '404':
           description: Aucune déclaration trouvée
-  
+
   /v1/declarations/{id}:
     get:
       tags:
@@ -223,8 +232,8 @@ paths:
         '404':
           description: Déclaration non trouvée
         '401':
-          description: Non autorisé   
-          
+          description: Non autorisé
+
     patch:
       tags:
         - declarations
@@ -282,11 +291,11 @@ paths:
                       format: int64
                 location:
                   type: object
-                  properties: 
-                    latitude: 
+                  properties:
+                    latitude:
                       type: number
                       format: double
-                    longitude: 
+                    longitude:
                       type: number
                       format: double
                   description: Localisation de la perte ou découverte
@@ -310,7 +319,7 @@ paths:
                   weight: 10
                   size: 64
                   age: 3
-                location: 
+                location:
                   latitude: 48.866667
                   longitude: 2.333333
                 photo: https://example.com/photos/dog.jpg
@@ -326,7 +335,7 @@ paths:
         '400':
           description: Données invalides
         '404':
-          description: Déclaration non trouvée      
+          description: Déclaration non trouvée
   /v1/users:
     post:
       tags:
@@ -354,7 +363,7 @@ paths:
                 username: "Lionel"
                 email: "unemail@gmail.com"
                 phone: "+33754871209"
-              
+
       responses:
         '201':
           description: Profil utilisateur créé
@@ -362,7 +371,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Users'
-          
+
         '400':
           description: Données utilisateur invalides
 
@@ -380,12 +389,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedUsers'
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaginatedUsers'
         '404':
           description: Aucun utilisateur trouvé
         '401':
           description: Utilisateur non vérifié
-          
+
   /v1/users/{id}:
     get:
       tags:
@@ -432,8 +443,8 @@ paths:
         '404':
           description: Utilisateur non trouvé
         '401':
-          description: Non autorisé     
-          
+          description: Non autorisé
+
     patch:
       tags:
         - users
@@ -501,6 +512,29 @@ paths:
                 $ref: '#/components/schemas/AuthResponse'
         '401':
           description: Échec de l'authentification (identifiants invalides)
+  /v1/users/register:
+    post:
+      tags:
+        - users
+      summary: création de compte d'un utilisateur
+      description: Permet aux utilisateurs de créer un compte SafeReturn
+      operationId: register
+      requestBody:
+        description: Informations de connexion de l'utilisateur
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthRequest'
+      responses:
+        '200':
+          description: Authentification réussie
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '401':
+          description: Échec de l'authentification (identifiants invalides)
   /v1/payments:
     post:
       tags:
@@ -536,11 +570,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedPayments'
+                type: array
+                items:
+                  $ref: '#/components/schemas/PaginatedPayments'
         '404':
           description: Aucun paiement trouvé
   /v1/payments/{id}:
-  
+
     get:
       tags:
         - payments
@@ -564,7 +600,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Payments'
         '404':
-          description: Paiement non trouvé   
+          description: Paiement non trouvé
     delete:
       tags:
         - payments
@@ -586,8 +622,8 @@ paths:
         '404':
           description: Paiement non trouvé
         '401':
-          description: Non autorisé    
-          
+          description: Non autorisé
+
     patch:
       tags:
         - payments
@@ -664,9 +700,134 @@ paths:
         '400':
           description: Données invalides
         '404':
-          description: Paiement non trouvé    
-          
-          
+          description: Paiement non trouvé
+
+  /v1/subscriptions:
+    post:
+      tags:
+        - subscriptions
+      summary: Créer un abonnement
+      description: Permet de souscrire à un abonnement premium.
+      operationId: createSubscription
+      requestBody:
+        description: Détails de l'abonnement
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                planId:
+                  type: integer
+                  description: ID du plan d'abonnement choisi
+                userId:
+                  type: integer
+                  description: ID de l'utilisateur souscrivant à l'abonnement
+      responses:
+        '201':
+          description: Abonnement créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: Données invalides
+
+    get:
+      tags:
+        - subscriptions
+      summary: Liste des abonnements
+      description: Récupère la liste des abonnements disponibles.
+      operationId: listSubscriptions
+      responses:
+        '200':
+          description: Liste des abonnements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subscription'
+        '404':
+          description: Aucun abonnement trouvé
+
+  /v1/subscriptions/{id}:
+    get:
+      tags:
+        - subscriptions
+      summary: Obtenir un abonnement
+      description: Récupère les détails d'un abonnement spécifique.
+      operationId: getSubscriptionById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Abonnement trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '404':
+          description: Abonnement non trouvé
+
+
+    patch:
+      tags:
+        - subscriptions
+      summary: Mettre à jour un abonnement
+      description: Met à jour les informations d'un abonnement existant.
+      operationId: updateSubscription
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Champs à mettre à jour
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [active, cancelled]
+      responses:
+        '200':
+          description: Abonnement mis à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: Données invalides
+        '404':
+          description: Abonnement non trouvé
+
+    delete:
+      tags:
+        - subscriptions
+      summary: Annuler un abonnement
+      description: Annule un abonnement existant.
+      operationId: deleteSubscription
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Abonnement annulé avec succès
+        '404':
+          description: Abonnement non trouvé
+
 components:
   securitySchemes:
     bearerAuth:
@@ -674,7 +835,41 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
-  
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID unique de l'abonnement
+        userId:
+          type: integer
+          description: ID de l'utilisateur
+        startDate:
+          type: string
+          format: date-time
+          pattern: "YYYY-MM-DD"
+          minLength: 0
+          maxLength: 10
+          description: Date de début de l'abonnement
+        endDate:
+          type: string
+          format: date-time
+          pattern: "YYYY-MM-DD"
+          minLength: 0
+          maxLength: 10
+          description: Date de fin de l'abonnement
+        status:
+          type: string
+          enum: [active, cancelled]
+          description: Statut actuel de l'abonnement
+      example:
+        id: 2
+        userId: 13
+        startDate: "2017-01-01"
+        endDate:  "2017-04-01"
+        status: active
+
     AuthRequest:
       type: object
       properties:
@@ -700,7 +895,7 @@ components:
       example:
         token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
         expiresIn: "9000000"
-          
+
     Declarations:
       type: object
       properties:
@@ -741,11 +936,11 @@ components:
               format: int64
         location:
           type: object
-          properties: 
-            latitude: 
+          properties:
+            latitude:
               type: number
               format: double
-            longitude: 
+            longitude:
               type: number
               format: double
           description: Localisation de la perte ou découverte
@@ -770,7 +965,7 @@ components:
           weight: 10
           size: 64
           age: 3
-        location: 
+        location:
           latitude: 48.866667
           longitude: 2.333333
         photo: https://example.com/photos/dog.jpg
@@ -827,7 +1022,7 @@ components:
         currency: "Yen"
         method: "credit_card"
         status: "success"
-          
+
     PaginatedDeclarations:
       type: object
       properties:
@@ -845,31 +1040,29 @@ components:
           type: integer
           description: Numéro de la page actuelle
       example:
-        items: [
-        {
-          id: 45,
-          type: lost,
-          animalDetails: {
-            species: dog,
-            breed: labrador,
-            color: [black, white],
-            weight: 10,
-            size: 64,
-            age: 3
-          },
-          location: {
-            latitude: 48.866667,
-            longitude: 2.333333
-          },
-          photo: https://example.com/photos/dog.jpg,
-          reward: 60,
-          status: active
-        }
-        ]
+        items:
+          - id: 45
+            type: "lost"
+            animalDetails:
+              species: "dog"
+              breed: "labrador"
+              color:
+                - "black"
+                - "white"
+              weight: 10
+              size: 64
+              age: 3
+            location:
+              latitude: 48.866667
+              longitude: 2.333333
+            photo: "https://example.com/photos/dog.jpg"
+            reward: 60
+            status: "active"
         totalItems: 1
         totalPages: 1
         currentPage: 1
-        
+
+
     PaginatedUsers:
       type: object
       properties:
@@ -887,17 +1080,15 @@ components:
           type: integer
           description: Numéro de la page actuelle
       example:
-        items: [
-        {
-          id: 40,
-          username: "Lionel",
-          email: "unemail@gmail.com",
-          phone: "+33754871209"
-        }
-        ]
+        items:
+          - id: 40
+            username: "Lionel"
+            email: "unemail@gmail.com"
+            phone: "+33754871209"
         totalItems: 1
         totalPages: 1
         currentPage: 1
+
     PaginatedPayments:
       type: object
       properties:
@@ -913,19 +1104,17 @@ components:
           description: Nombre total de pages
         currentPage:
           type: integer
-          description: Numéro de la page actuelle      
+          description: Numéro de la page actuelle
       example:
-        items: [
-        {
-          rewarderId: 40,
-          receiverId: 52,
-          correlationId: 111111,
-          amount: 9999999,
-          currency: "Yen",
-          method: "credit_card",
-          status: "success"
-        }
-        ]
+        items:
+          - rewarderId: 40
+            receiverId: 52
+            correlationId: 111111
+            amount: 9999999
+            currency: "Yen"
+            method: "credit_card"
+            status: "success"
         totalItems: 1
         totalPages: 1
         currentPage: 1
+
