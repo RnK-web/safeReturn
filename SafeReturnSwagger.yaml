@@ -85,11 +85,11 @@ paths:
                 photo:
                   type: string
                   format: uri
-                  description: Photo de l'animal
+                  description: Lien vers la photo de l'animal
                 reward:
                   type: integer
                   format: int64
-                  description: Récompense proposée
+                  description: Récompense proposée en euros pour celui qui trouvera l'animal
                 status:
                   type: string
                   enum: [active, resolved]
@@ -106,6 +106,7 @@ paths:
                   latitude: 48.866667
                   longitude: 2.333333
                 photo: https://example.com/photos/dog.jpg
+                reward: 60
                 status: active
           
       responses:
@@ -131,6 +132,7 @@ paths:
                       latitude: 48.866667
                       longitude: 2.333333
                     photo: https://example.com/photos/dog.jpg
+                    reward: 60
                     status: active
         '400':
           description: Données invalides
@@ -138,11 +140,17 @@ paths:
       tags:
         - declarations
       summary: Liste des déclarations
-      description: Récupère les déclarations d'animaux perdus.
+      description: Récupère l'ensemble des déclarations disponibles. La récupération en mode pagination est disponible grâce au paramètre "page". Si le paramètre page n'est pas renseigné alors la réponse contiendra l'ensemble des déclarations, sinon la réponse contiendra un paquet de 50 déclarations.
       operationId: listDeclarations
       security:
         - bearerAuth: []
       parameters:
+        - name: page
+          in: query
+          description: Récupérer les déclarations en mode pagination. La numérotation des pages commencent au numéro 0, ainsi pour requêter la première page il faudra mettre ce paramètre à 0.
+          schema:
+            type: integer
+            format: int64
         - name: status
           in: query
           description: Filtrer par statut (perdu ou trouvé)
@@ -285,11 +293,11 @@ paths:
                 photo:
                   type: string
                   format: uri
-                  description: Photo de l'animal
+                  description: Lien vers la photo de l'animal
                 reward:
                   type: integer
                   format: int64
-                  description: Récompense proposée
+                  description: Récompense proposée en euros pour celui qui trouvera l'animal
                 status:
                   type: string
                   enum: [active, resolved]
@@ -306,6 +314,7 @@ paths:
                   latitude: 48.866667
                   longitude: 2.333333
                 photo: https://example.com/photos/dog.jpg
+                reward: 60
                 status: active
       responses:
         '200':
@@ -743,11 +752,11 @@ components:
         photo:
           type: string
           format: uri
-          description: Photo de l'animal
+          description: Lien vers la photo de l'animal
         reward:
           type: integer
           format: int64
-          description: Récompense proposée
+          description: Récompense proposée en euros pour celui qui trouvera l'animal
         status:
           type: string
           enum: [active, resolved]
@@ -765,6 +774,7 @@ components:
           latitude: 48.866667
           longitude: 2.333333
         photo: https://example.com/photos/dog.jpg
+        reward: 60
         status: active
 
     Users:
@@ -833,7 +843,7 @@ components:
           description: Nombre total de pages
         currentPage:
           type: integer
-          description: Page actuelle
+          description: Numéro de la page actuelle
       example:
         items: [
         {
@@ -852,6 +862,7 @@ components:
             longitude: 2.333333
           },
           photo: https://example.com/photos/dog.jpg,
+          reward: 60,
           status: active
         }
         ]
@@ -874,7 +885,7 @@ components:
           description: Nombre total de pages
         currentPage:
           type: integer
-          description: Page actuelle
+          description: Numéro de la page actuelle
       example:
         items: [
         {
@@ -902,7 +913,7 @@ components:
           description: Nombre total de pages
         currentPage:
           type: integer
-          description: Page actuelle      
+          description: Numéro de la page actuelle      
       example:
         items: [
         {
