@@ -1,7 +1,6 @@
 package fr.uge.api.safeReturn.controller;
 
 import fr.uge.api.safeReturn.model.PaginatedItems;
-import fr.uge.api.safeReturn.model.Payment;
 import fr.uge.api.safeReturn.model.Subscription;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
