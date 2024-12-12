@@ -17,17 +17,17 @@ public class UserService {
     @Autowired
     private JwtService jwtService;
 
-    public boolean registerUser(String username, String password) {
+    public User registerUser(String username, String password, String email, String phone) {
         if (!users.isEmpty()) {
             if (users.values().stream().anyMatch(u -> u.username().equals(username))) {
-                return false;
+                return null;
             }
         }
 
 
-        User newUser = new User(nextId++, username, password, null, null);
+        User newUser = new User(nextId++, username, password, email, phone);
         users.put(newUser.id(),newUser);
-        return true;
+        return newUser;
     }
 
 

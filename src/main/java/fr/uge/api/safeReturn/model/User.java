@@ -9,7 +9,4 @@ import lombok.Setter;
 @Setter
 public record User (Long id,String username,String password,String email,String phone) {
 
-    public User(Long id,String username, String password) {
-        this(id, username, password, null, null);
-    }
 }
