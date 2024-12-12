@@ -9,9 +9,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import fr.uge.api.safeReturn.model.Declaration;
+import fr.uge.api.safeReturn.model.PaginatedDeclaration;
 
 @RestController
 public class DeclarationController {
+	private static final int PAGE_SIZE = 50;
 	private Long nextDeclarationId = 0l;
 	private final HashMap<Long, Declaration> declarationStore = new HashMap<>();
 
@@ -24,11 +26,33 @@ public class DeclarationController {
 	}
 	
 	@GetMapping("/v1/declarations")
-	public List<Declaration> getDeclarations() {
+	public PaginatedDeclaration getDeclarations(@RequestParam(name = "page", required = false) String page) {
 		if (declarationStore.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No declarations were found !");
 		}
-		return declarationStore.values().stream().toList();
+		if (page == null) {
+			var declas = declarationStore.values().stream().toList();
+			return new PaginatedDeclaration(declas, declas.size(), 1, 1);
+		}
+		int pageNum;
+		try {
+			pageNum = Integer.parseInt(page);
+		} catch (NumberFormatException e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Page must be an int");
+		}
+		if (pageNum < 0) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Page can't be negative");
+		}
+		try {
+			var totalPages = declarationStore.size() / PAGE_SIZE;
+			var totalItems = declarationStore.size();
+			var currentPage = pageNum;
+			var toIndex = Math.min((pageNum + 1) * PAGE_SIZE, declarationStore.size());
+			var declas = declarationStore.values().stream().toList().subList(pageNum * PAGE_SIZE, toIndex);
+			return new PaginatedDeclaration(declas, totalItems, totalPages, currentPage);
+		} catch (Exception e) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Page is not a valid number");
+		}
 	}
 	
 	@GetMapping("/v1/declarations/{id}")
