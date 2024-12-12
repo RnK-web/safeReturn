@@ -379,10 +379,17 @@ paths:
       tags:
         - users
       summary: Liste des utilisateurs
-      description: Récupère la liste de tous les utilisateurs enregistrés.
+      description: Récupère l'ensemble des utilisateurs enregistrés. La récupération en mode pagination est disponible grâce au paramètre "page". Si le paramètre page n'est pas renseigné alors la réponse contiendra l'ensemble des utilisateurs, sinon la réponse contiendra un paquet de 50 utilisateurs.
       operationId: listUsers
       security:
         - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Récupérer les utilisateurs en mode pagination. La numérotation des pages commencent au numéro 0, ainsi pour requêter la première page il faudra mettre ce paramètre à 0.
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
           description: Liste des utilisateurs avec pagination
@@ -548,7 +555,38 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Payments'
+              type: object
+              properties:
+                rewarderId:
+                  type: integer
+                  description: Id of the user who posted the declaration
+                receiverId:
+                  type: integer
+                  description: Id of the user who received the declaration's reward
+                correlationId:
+                  type: integer
+                  description: Id given by the client that describes a unique payment in their system
+                amount:
+                  type: number
+                  format: float
+                  description: Sum of the transaction
+                currency:
+                  type: string
+                  description: Currency of the transaction (dollar, euro, etc...)
+                method:
+                  type: string
+                  enum: [credit_card, paypal, bank_transfer]
+                status:
+                  type: string
+                  enum: [success, failed]
+            example:
+              rewarderId: 40
+              receiverId: 52
+              correlationId: 111111
+              amount: 9999999
+              currency: "Yen"
+              method: "credit_card"
+              status: "success"
       responses:
         '200':
           description: Paiement réussi
@@ -562,8 +600,15 @@ paths:
       tags:
         - payments
       summary: Historique des paiements
-      description: Récupère la liste des paiements effectués par les utilisateurs.
+      description: Récupère la liste des paiements effectués par les utilisateurs. La récupération en mode pagination est disponible grâce au paramètre "page". Si le paramètre page n'est pas renseigné alors la réponse contiendra l'ensemble des paiements, sinon la réponse contiendra un paquet de 50 paiements.
       operationId: listPayments
+      parameters:
+        - name: page
+          in: query
+          description: Récupérer les utilisateurs en mode pagination. La numérotation des pages commencent au numéro 0, ainsi pour requêter la première page il faudra mettre ce paramètre à 0.
+          schema:
+            type: integer
+            format: int64
       responses:
         '200':
           description: Liste des paiements avec pagination
@@ -581,7 +626,7 @@ paths:
       tags:
         - payments
       summary: Obtenir un paiement
-      description: Récupère les informations d'un paiement à partir de son ID de correlation.
+      description: Récupère les informations d'un paiement à partir de son ID.
       operationId: getPaymentById
       security:
         - bearerAuth: []
@@ -667,29 +712,36 @@ paths:
               schema:
                 type: object
                 properties:
+                  id: 
+                    type: integer
+                    format: int64
+                    description: Id unique du paiement
                   rewarderId:
                     type: integer
-                    description: Id of the user who posted the declaration
+                    description: Id de l'utilisateur qui a posté la declaration
                   receiverId:
                     type: integer
-                    description: Id of the user who received the declaration's reward
+                    description: Id de l'utilisateur qui a recu le paiement de la récompense
                   correlationId:
                     type: integer
-                    description: Id given by the client that describes a unique transaction
+                    description: Id qui décrit cette transaction de manière unique dans le système du client appelant cette api
                   amount:
                     type: number
                     format: float
-                    description: Sum of the transaction
+                    description: Montant de la transaction
                   currency:
                     type: string
-                    description: Currency of the transaction (dollar, euro, etc...)
+                    description: La devise utilisée pour le paiement (dollar, euro, etc...)
                   method:
                     type: string
                     enum: [credit_card, paypal, bank_transfer]
+                    description: Méthode utilisée pour le paiement
                   status:
                     type: string
                     enum: [success, failed]
+                    description: Statut du paiement (refusé ou accepté)
                 example:
+                  id: 13
                   rewarderId: 40
                   receiverId: 52
                   correlationId: 111111
@@ -875,11 +927,11 @@ components:
       properties:
         username:
           type: string
-          description: Nom d'utilisateur ou email
+          description: Nom de profil de l'utilisateur
         password:
           type: string
           format: password
-          description: Mot de passe
+          description: Mot de passe de l'utilisateur
       example:
         username: "Lionel112"
         password: "1234567890"
@@ -978,12 +1030,16 @@ components:
         id:
           type: integer
           format: int64
+          description: Id unique de l'utilisateur
         username:
           type: string
+          description: Nom de profil de l'utilisateur
         email:
           type: string
+          description: Email de l'utilisateur
         phone:
           type: string
+          description: Numéro de téléphone de l'utilisateur. Doit respecter le format suivant, +33XXXXXXXXX en adaptant +33 avec le numéro associé à votre pays
       example:
         id: 40
         username: "Lionel"
@@ -992,29 +1048,36 @@ components:
     Payments:
       type: object
       properties:
+        id: 
+          type: integer
+          format: int64
+          description: Id unique du paiement
         rewarderId:
           type: integer
-          description: Id of the user who posted the declaration
+          description: Id de l'utilisateur qui a posté la declaration
         receiverId:
           type: integer
-          description: Id of the user who received the declaration's reward
+          description: Id de l'utilisateur qui a recu le paiement de la récompense
         correlationId:
           type: integer
-          description: Id given by the client that describes a unique transaction
+          description: Id qui décrit cette transaction de manière unique dans le système du client appelant cette api
         amount:
           type: number
           format: float
-          description: Sum of the transaction
+          description: Montant de la transaction
         currency:
           type: string
-          description: Currency of the transaction (dollar, euro, etc...)
+          description: La devise utilisée pour le paiement (dollar, euro, etc...)
         method:
           type: string
           enum: [credit_card, paypal, bank_transfer]
+          description: Méthode utilisée pour le paiement
         status:
           type: string
           enum: [success, failed]
+          description: Statut du paiement (refusé ou accepté)
       example:
+        id: 13
         rewarderId: 40
         receiverId: 52
         correlationId: 111111
@@ -1107,7 +1170,8 @@ components:
           description: Numéro de la page actuelle
       example:
         items:
-          - rewarderId: 40
+          - id: 13
+            rewarderId: 40
             receiverId: 52
             correlationId: 111111
             amount: 9999999
