@@ -25,7 +25,32 @@ public class SubscriptionController {
 
     @GetMapping("/v1/subscriptions")
     public PaginatedItems<Subscription> getSubscriptions(@RequestParam(name = "page", required = false) String page) {
-        return null;
+        if (subscriptionStore.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No subscriptions were found !");
+        }
+        if (page == null) {
+            var subscriptions = subscriptionStore.values().stream().toList();
+            return new PaginatedItems<>(subscriptions, subscriptions.size(), 0, 0);
+        }
+        int pageNum;
+        try {
+            pageNum = Integer.parseInt(page);
+        } catch (NumberFormatException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Page must be an int");
+        }
+        if (pageNum < 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Page can't be negative");
+        }
+        try {
+            var totalPages = subscriptionStore.size() / PAGE_SIZE;
+            var totalItems = subscriptionStore.size();
+            var currentPage = pageNum;
+            var toIndex = Math.min((pageNum + 1) * PAGE_SIZE, subscriptionStore.size());
+            var subscriptions = subscriptionStore.values().stream().toList().subList(pageNum * PAGE_SIZE, toIndex);
+            return new PaginatedItems<>(subscriptions, totalItems, totalPages, currentPage);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Page is not a valid number");
+        }
     }
 
     @GetMapping("/v1/subscriptions/{id}")
