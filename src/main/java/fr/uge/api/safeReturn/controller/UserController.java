@@ -19,21 +19,23 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class UserController {
+	
+	record UserInfos(Long id, String username, String email, String phone) {}
 
 	private static final int PAGE_SIZE = 5;
 	@Autowired
 	private UserService userService;
 
 	@GetMapping("/v1/users")
-	public PaginatedItems < User > getUsers(@RequestParam(name = "page", required = false) String page, @RequestHeader("Authorization") String authorizationHeader) {
+	public PaginatedItems < UserInfos > getUsers(@RequestParam(name = "page", required = false) String page, @RequestHeader("Authorization") String authorizationHeader) {
 
 		if (!userService.isValidToken(authorizationHeader)) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid token");
 		}
 
 		if (page == null) {
-			var users = userService.getAllUsers();
-			return new PaginatedItems < User > (users, users.size(), 0, 0);
+			var users = userService.getAllUsers().stream().map(u -> new UserInfos(u.id(), u.username(), u.email(), u.phone())).toList();
+			return new PaginatedItems < UserInfos > (users, users.size(), 0, 0);
 		}
 		int pageNum;
 		try {
@@ -49,8 +51,8 @@ public class UserController {
 			var totalPages = totalItems / PAGE_SIZE;
 			var currentPage = pageNum;
 			var toIndex = Math.min((pageNum + 1) * PAGE_SIZE, totalItems);
-			var payments = userService.getAllUsers().stream().toList().subList(pageNum * PAGE_SIZE, toIndex);
-			return new PaginatedItems < User > (payments, totalItems, totalPages, currentPage);
+			var payments = userService.getAllUsers().stream().map(u -> new UserInfos(u.id(), u.username(), u.email(), u.phone())).toList().subList(pageNum * PAGE_SIZE, toIndex);
+			return new PaginatedItems < UserInfos > (payments, totalItems, totalPages, currentPage);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Page is not a valid number");
 		}
