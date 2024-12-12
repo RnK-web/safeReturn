@@ -1,9 +1,6 @@
 package fr.uge.api.safeReturn.controller;
 
-import fr.uge.api.safeReturn.model.PaginatedItems;
-import fr.uge.api.safeReturn.model.Payment;
-import fr.uge.api.safeReturn.model.Subscription;
-import fr.uge.api.safeReturn.model.SubscriptionRequest;
+import fr.uge.api.safeReturn.model.*;
 import fr.uge.api.safeReturn.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -113,7 +110,7 @@ public class SubscriptionController {
     }
 
     @PatchMapping("/v1/subscriptions/{id}")
-    public Subscription updateSubscription(@PathVariable long id, @RequestBody Subscription updateValues, @RequestHeader("Authorization") String authorizationHeader) {
+    public Subscription updateSubscription(@PathVariable long id, @RequestBody Status updateValues, @RequestHeader("Authorization") String authorizationHeader) {
 
         if (!userService.isValidToken(authorizationHeader)) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid token");
