@@ -20,7 +20,7 @@ info:
 
   version: 1.0.0
 servers:
-  - url: https://api.safereturn.com
+  - url: http://localhost:8080
     description: Serveur principal de SafeReturn
 tags:
   - name: declarations
