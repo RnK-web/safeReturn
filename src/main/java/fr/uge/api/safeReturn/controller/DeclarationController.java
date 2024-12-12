@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import fr.uge.api.safeReturn.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,7 +20,10 @@ import fr.uge.api.safeReturn.model.Payment;
 public class DeclarationController {
 	private static final int PAGE_SIZE = 5;
 	private Long nextDeclarationId = 0l;
-	private final HashMap<Long, Declaration> declarationStore = new HashMap<>();
+	private final HashMap < Long, Declaration > declarationStore = new HashMap < > ();
+
+	@Autowired
+	private UserService userService;
 
 	@PostMapping("/v1/declarations")
 	@ResponseStatus(value = HttpStatus.CREATED)
@@ -28,15 +33,18 @@ public class DeclarationController {
 		nextDeclarationId++;
 		return decla;
 	}
-	
+
 	@GetMapping("/v1/declarations")
-	public PaginatedItems<Declaration> getDeclarations(@RequestParam(name = "page", required = false) String page,
-																										@RequestParam(name = "status", required = false) String status,
-																										@RequestParam(name = "animal", required = false) String animal) {
+	public PaginatedItems < Declaration > getDeclarations(@RequestParam(name = "page", required = false) String page,
+														  @RequestParam(name = "status", required = false) String status,
+														  @RequestParam(name = "animal", required = false) String animal, @RequestHeader("Authorization") String authorizationHeader) {
+		if (!userService.isValidToken(authorizationHeader)) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid token");
+		}
 		if (declarationStore.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No declarations were found !");
 		}
-		Predicate<Declaration> filter = (d) -> true;
+		Predicate < Declaration > filter = (d) -> true;
 		if (status != null) {
 			filter = filter.and((d) -> d.type().toLowerCase().equals(status.toLowerCase()));
 		}
@@ -45,7 +53,7 @@ public class DeclarationController {
 		}
 		if (page == null) {
 			var declas = declarationStore.values().stream().filter(filter).toList();
-			return new PaginatedItems<Declaration>(declas, declas.size(), 0, 0);
+			return new PaginatedItems < Declaration > (declas, declas.size(), 0, 0);
 		}
 		int pageNum;
 		try {
@@ -64,14 +72,17 @@ public class DeclarationController {
 			var toIndex = Math.min((pageNum + 1) * PAGE_SIZE, items.size());
 			var declas = items.subList(pageNum * PAGE_SIZE, toIndex);
 			System.out.println(items);
-			return new PaginatedItems<Declaration>(declas, totalItems, totalPages, currentPage);
+			return new PaginatedItems < Declaration > (declas, totalItems, totalPages, currentPage);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Page is not a valid number");
 		}
 	}
-	
+
 	@GetMapping("/v1/declarations/{id}")
-	public Declaration getDeclarationById(@PathVariable long id) {
+	public Declaration getDeclarationById(@PathVariable long id, @RequestHeader("Authorization") String authorizationHeader) {
+		if (!userService.isValidToken(authorizationHeader)) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid token");
+		}
 		var decla = declarationStore.get(id);
 		if (decla == null) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Declaration with id {" + id + "} not found !");
@@ -81,7 +92,10 @@ public class DeclarationController {
 
 	@DeleteMapping("/v1/declarations/{id}")
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
-	public void deleteDeclarationById(@PathVariable long id) {
+	public void deleteDeclarationById(@PathVariable long id, @RequestHeader("Authorization") String authorizationHeader) {
+		if (!userService.isValidToken(authorizationHeader)) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid token");
+		}
 		var removedDecla = declarationStore.remove(id);
 		if (removedDecla == null) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Declaration with id {" + id + "} not found !");
@@ -89,7 +103,12 @@ public class DeclarationController {
 	}
 
 	@PatchMapping("/v1/declarations/{id}")
-	public Declaration updateDeclaration(@PathVariable long id, @RequestBody Declaration updateValues) {
+	public Declaration updateDeclaration(@PathVariable long id, @RequestBody Declaration updateValues, @RequestHeader("Authorization") String authorizationHeader) {
+
+		if (!userService.isValidToken(authorizationHeader)) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid token");
+		}
+
 		var previousDeclaration = declarationStore.get(id);
 		if (previousDeclaration == null) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Declaration with id {" + id + "} not found !");
@@ -104,5 +123,5 @@ public class DeclarationController {
 		declarationStore.replace(id, patchedDecla);
 		return patchedDecla;
 	}
-	
+
 }

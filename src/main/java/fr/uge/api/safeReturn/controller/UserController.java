@@ -24,12 +24,16 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 
-
 	@GetMapping("/v1/users")
-	public PaginatedItems<User> getUsers(@RequestParam(name = "page", required = false) String page) {
+	public PaginatedItems < User > getUsers(@RequestParam(name = "page", required = false) String page, @RequestHeader("Authorization") String authorizationHeader) {
+
+		if (!userService.isValidToken(authorizationHeader)) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid token");
+		}
+
 		if (page == null) {
 			var users = userService.getAllUsers();
-			return new PaginatedItems<User>(users, users.size(), 0, 0);
+			return new PaginatedItems < User > (users, users.size(), 0, 0);
 		}
 		int pageNum;
 		try {
@@ -42,33 +46,41 @@ public class UserController {
 		}
 		try {
 			var totalItems = userService.getAllUsers().size();
-			var totalPages = totalItems/ PAGE_SIZE;
+			var totalPages = totalItems / PAGE_SIZE;
 			var currentPage = pageNum;
 			var toIndex = Math.min((pageNum + 1) * PAGE_SIZE, totalItems);
 			var payments = userService.getAllUsers().stream().toList().subList(pageNum * PAGE_SIZE, toIndex);
-			return new PaginatedItems<User>(payments, totalItems, totalPages, currentPage);
+			return new PaginatedItems < User > (payments, totalItems, totalPages, currentPage);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Page is not a valid number");
 		}
 	}
-	
-	@GetMapping("/v1/users/{id}")
-	public User getUserById(@PathVariable long id) {
-		return userService.getUserById(id);
-	}
-	
 
+	@GetMapping("/v1/users/{id}")
+	public ResponseEntity < Map < String, Object >> getUserById(@PathVariable long id, @RequestHeader("Authorization") String authorizationHeader) {
+
+		if (!userService.isValidToken(authorizationHeader)) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid token");
+		}
+		Map < String, Object > response = new LinkedHashMap < > ();
+		var user = userService.getUserById(id);
+		response.put("id", user.id());
+		response.put("username", user.username());
+		response.put("email", user.email());
+		response.put("phone", user.phone());
+		return ResponseEntity.ok(response);
+	}
 
 	@PostMapping("/v1/users")
-	public ResponseEntity<Map<String, Object>> registerUser(
-			@RequestBody Map<String, String> payload) {
+	public ResponseEntity < Map < String, Object >> registerUser(
+			@RequestBody Map < String, String > payload) {
 
 		String username = payload.get("username");
 		String password = payload.get("password");
 		String email = payload.get("email");
 		String phone = payload.get("phone");
 
-		Map<String, Object> response = new LinkedHashMap<>();
+		Map < String, Object > response = new LinkedHashMap < > ();
 
 		var registered = userService.registerUser(username, password, email, phone);
 
@@ -79,48 +91,47 @@ public class UserController {
 			response.put("phone", registered.phone());
 			return ResponseEntity.ok(response);
 		} else {
-			//response.put("message", "Nom d'utilisateur déjà existant");
 			return ResponseEntity.badRequest().body(response);
 		}
 	}
 
-
 	@PostMapping("/v1/users/login")
-	public ResponseEntity<Map<String, Object>> loginUser(
-			@RequestBody Map<String, String> payload) {
+	public ResponseEntity < Map < String, Object >> loginUser(
+			@RequestBody Map < String, String > payload) {
 
 		String username = payload.get("username");
 		String password = payload.get("password");
 
-		Map<String, Object> response = new HashMap<>();
+		Map < String, Object > response = new HashMap < > ();
 
 		String token = userService.loginUser(username, password);
 
-		if (token != null) {
-			response.put("token", token);
-			return ResponseEntity.ok(response);
-		} else {
-			//response.put("message", "Identifiants invalides");
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+		if (token == null) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "invalid username or password");
+
 		}
+		response.put("token", token);
+		userService.addToken(token);
+		return ResponseEntity.ok(response);
 	}
 
-
 	@PatchMapping("/v1/users/{id}")
-	public ResponseEntity<Map<String, Object>> updateUser(@PathVariable long id, @RequestBody Map<String, String> payload) {
+	public ResponseEntity < Map < String, Object >> updateUser(@PathVariable long id, @RequestHeader("Authorization") String authorizationHeader, @RequestBody Map < String, String > payload) {
 
+		if (!userService.isValidToken(authorizationHeader)) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid token");
+		}
+		Map < String, Object > response = new LinkedHashMap < > ();
 		var previousUser = userService.getUserById(id);
 
 		String username = payload.get("username") == null ? previousUser.username() : payload.get("username");
-		String password = previousUser.password() ;
+		String password = previousUser.password();
 		String email = payload.get("email") == null ? previousUser.email() : payload.get("email");
 		String phone = payload.get("phone") == null ? previousUser.phone() : payload.get("phone");
 
-
-        var patchedUser = new User(id, username, password, email, phone);
+		var patchedUser = new User(id, username, password, email, phone);
 		userService.replace(id, patchedUser);
 
-		Map<String, Object> response = new LinkedHashMap<>();
 		response.put("id", patchedUser.id());
 		response.put("username", patchedUser.username());
 		response.put("email", patchedUser.email());
@@ -129,7 +140,11 @@ public class UserController {
 	}
 
 	@DeleteMapping("/v1/users/{id}")
-	public void deleteUserById(@PathVariable long id) {
+	public void deleteUserById(@PathVariable long id, @RequestHeader("Authorization") String authorizationHeader) {
+
+		if (!userService.isValidToken(authorizationHeader)) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid token");
+		}
 		userService.deleteUserById(id);
 	}
 

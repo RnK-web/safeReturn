@@ -6,12 +6,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 @Service
 public class UserService {
     //private List<User> users = new ArrayList<>();
-    private final HashMap<Long, User> users = new HashMap<>();
+    private final HashMap < Long, User > users = new HashMap < > ();
+    private final HashSet < String > tokens = new HashSet < > ();
     private Long nextId = 0L;
 
     @Autowired
@@ -42,12 +44,10 @@ public class UserService {
             }
         }
 
-
         User newUser = new User(nextId++, username, password, email, phone);
-        users.put(newUser.id(),newUser);
+        users.put(newUser.id(), newUser);
         return newUser;
     }
-
 
     public String loginUser(String username, String password) {
         User user = users.values().stream()
@@ -55,15 +55,14 @@ public class UserService {
                 .findFirst()
                 .orElse(null);
 
-
         if (user != null) {
             return jwtService.generateToken(user);
         }
         return null;
     }
 
-    public List<User> getAllUsers() {
-        return new ArrayList<>(users.values());
+    public List < User > getAllUsers() {
+        return new ArrayList < > (users.values());
     }
 
     public User getUserById(Long id) {
@@ -77,5 +76,14 @@ public class UserService {
 
     public User replace(Long id, User user) {
         return users.replace(id, user);
+    }
+
+    public boolean isValidToken(String token) {
+        System.out.println(token);
+        return tokens.contains(token.substring(7));
+    }
+
+    public void addToken(String token) {
+        tokens.add(token);
     }
 }

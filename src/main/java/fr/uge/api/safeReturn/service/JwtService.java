@@ -17,18 +17,18 @@ public class JwtService {
         Date now = new Date(nowMillis);
 
         return Jwts.builder()
-            .setSubject(user.username())
-            .setIssuedAt(now)
-            .setExpiration(new Date(nowMillis + 3600000)) // Expire dans 1 heure
-            .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
-            .compact();
+                .setSubject(user.username())
+                .setIssuedAt(now)
+                .setExpiration(new Date(nowMillis + 3600000)) // Expire dans 1 heure
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .compact();
     }
 
     public boolean validateToken(String token, String username) {
         try {
             Jwts.parser()
-                .setSigningKey(SECRET_KEY)
-                .parseClaimsJws(token);
+                    .setSigningKey(SECRET_KEY)
+                    .parseClaimsJws(token);
             return true;
         } catch (Exception e) {
             return false;

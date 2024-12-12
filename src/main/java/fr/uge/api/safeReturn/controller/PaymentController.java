@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import fr.uge.api.safeReturn.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,7 +18,10 @@ public class PaymentController {
 
 	private static final int PAGE_SIZE = 5;
 	private Long nextPaymentId = 0l;
-	private final HashMap<Long, Payment> paymentStore = new HashMap<>();
+	private final HashMap < Long, Payment > paymentStore = new HashMap < > ();
+
+	@Autowired
+	private UserService userService;
 
 	@PostMapping("/v1/payments")
 	public Payment createPayment(@RequestBody Payment payment) {
@@ -25,15 +30,20 @@ public class PaymentController {
 		nextPaymentId++;
 		return createdPayment;
 	}
-	
+
 	@GetMapping("/v1/payments")
-	public PaginatedItems<Payment> getPayments(@RequestParam(name = "page", required = false) String page) {
+	public PaginatedItems < Payment > getPayments(@RequestParam(name = "page", required = false) String page, @RequestHeader("Authorization") String authorizationHeader) {
+
+		if (!userService.isValidToken(authorizationHeader)) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid token");
+		}
+
 		if (paymentStore.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No payments were found !");
 		}
 		if (page == null) {
 			var payments = paymentStore.values().stream().toList();
-			return new PaginatedItems<Payment>(payments, payments.size(), 0, 0);
+			return new PaginatedItems < Payment > (payments, payments.size(), 0, 0);
 		}
 		int pageNum;
 		try {
@@ -50,14 +60,17 @@ public class PaymentController {
 			var currentPage = pageNum;
 			var toIndex = Math.min((pageNum + 1) * PAGE_SIZE, paymentStore.size());
 			var payments = paymentStore.values().stream().toList().subList(pageNum * PAGE_SIZE, toIndex);
-			return new PaginatedItems<Payment>(payments, totalItems, totalPages, currentPage);
+			return new PaginatedItems < Payment > (payments, totalItems, totalPages, currentPage);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Page is not a valid number");
 		}
 	}
-	
+
 	@GetMapping("/v1/payments/{id}")
-	public Payment getPaymentById(@PathVariable long id) {
+	public Payment getPaymentById(@PathVariable long id, @RequestHeader("Authorization") String authorizationHeader) {
+		if (!userService.isValidToken(authorizationHeader)) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid token");
+		}
 		var payment = paymentStore.get(id);
 		if (payment == null) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment with id {" + id + "} not found !");
@@ -67,7 +80,10 @@ public class PaymentController {
 
 	@DeleteMapping("/v1/payments/{id}")
 	@ResponseStatus(value = HttpStatus.NO_CONTENT)
-	public void deletePaymentById(@PathVariable long id) {
+	public void deletePaymentById(@PathVariable long id, @RequestHeader("Authorization") String authorizationHeader) {
+		if (!userService.isValidToken(authorizationHeader)) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid token");
+		}
 		var removedPayment = paymentStore.remove(id);
 		if (removedPayment == null) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment with id {" + id + "} not found !");
@@ -75,7 +91,11 @@ public class PaymentController {
 	}
 
 	@PatchMapping("/v1/payments/{id}")
-	public Payment updatePayment(@PathVariable long id, @RequestBody Payment updateValues) {
+	public Payment updatePayment(@PathVariable long id, @RequestBody Payment updateValues, @RequestHeader("Authorization") String authorizationHeader) {
+
+		if (!userService.isValidToken(authorizationHeader)) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid token");
+		}
 		var previousPayment = paymentStore.get(id);
 		if (previousPayment == null) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment with id {" + id + "} not found !");
@@ -88,5 +108,5 @@ public class PaymentController {
 		paymentStore.replace(id, patchedPayment);
 		return patchedPayment;
 	}
-	
+
 }
