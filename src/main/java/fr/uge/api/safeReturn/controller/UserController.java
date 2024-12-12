@@ -34,7 +34,7 @@ public class UserController {
 	
 
 
-	@PostMapping("/v1/users/register")
+	@PostMapping("/v1/users")
 	public ResponseEntity<Map<String, Object>> registerUser(
 			@RequestBody Map<String, String> payload) {
 

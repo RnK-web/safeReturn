@@ -359,8 +359,11 @@ paths:
                   type: string
                 phone:
                   type: string
+                password:
+                  type: string
               example:
                 username: "Lionel"
+                password: "123456780"
                 email: "unemail@gmail.com"
                 phone: "+33754871209"
 
@@ -519,29 +522,7 @@ paths:
                 $ref: '#/components/schemas/AuthResponse'
         '401':
           description: Échec de l'authentification (identifiants invalides)
-  /v1/users/register:
-    post:
-      tags:
-        - users
-      summary: création de compte d'un utilisateur
-      description: Permet aux utilisateurs de créer un compte SafeReturn
-      operationId: register
-      requestBody:
-        description: Informations de connexion de l'utilisateur
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AuthRequest'
-      responses:
-        '200':
-          description: Authentification réussie
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthResponse'
-        '401':
-          description: Échec de l'authentification (identifiants invalides)
+
   /v1/payments:
     post:
       tags:
@@ -605,7 +586,7 @@ paths:
       parameters:
         - name: page
           in: query
-          description: Récupérer les utilisateurs en mode pagination. La numérotation des pages commencent au numéro 0, ainsi pour requêter la première page il faudra mettre ce paramètre à 0.
+          description: Récupérer les paiements en mode pagination. La numérotation des pages commencent au numéro 0, ainsi pour requêter la première page il faudra mettre ce paramètre à 0.
           schema:
             type: integer
             format: int64
@@ -712,7 +693,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  id: 
+                  id:
                     type: integer
                     format: int64
                     description: Id unique du paiement
@@ -769,12 +750,14 @@ paths:
             schema:
               type: object
               properties:
-                planId:
-                  type: integer
-                  description: ID du plan d'abonnement choisi
                 userId:
                   type: integer
                   description: ID de l'utilisateur souscrivant à l'abonnement
+                  example: 13
+                subscriptionDuration:
+                  type: integer
+                  description: Durée de l'abonnement en mois
+                  example: 3
       responses:
         '201':
           description: Abonnement créé avec succès
@@ -789,7 +772,14 @@ paths:
       tags:
         - subscriptions
       summary: Liste des abonnements
-      description: Récupère la liste des abonnements disponibles.
+      description: Récupère la liste des abonnements effectués par les utilisateurs. La récupération en mode pagination est disponible grâce au paramètre "page". Si le paramètre page n'est pas renseigné alors la réponse contiendra l'ensemble des abonnements, sinon la réponse contiendra un paquet de 50 abonnements.
+      parameters:
+        - name: page
+          in: query
+          description: Récupérer les abonnements en mode pagination. La numérotation des pages commencent au numéro 0, ainsi pour requêter la première page il faudra mettre ce paramètre à 0.
+          schema:
+            type: integer
+            format: int64
       operationId: listSubscriptions
       responses:
         '200':
@@ -797,9 +787,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Subscription'
+                $ref: '#/components/schemas/PaginatedSubscriptions'
         '404':
           description: Aucun abonnement trouvé
 
@@ -941,12 +929,8 @@ components:
         token:
           type: string
           description: Token JWT pour l'accès sécurisé
-        expiresIn:
-          type: integer
-          description: Durée de validité du token en secondes
       example:
         token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
-        expiresIn: "9000000"
 
     Declarations:
       type: object
@@ -1034,6 +1018,9 @@ components:
         username:
           type: string
           description: Nom de profil de l'utilisateur
+        password:
+          type: string
+          description: mot de passe de l'utilisateur
         email:
           type: string
           description: Email de l'utilisateur
@@ -1043,12 +1030,13 @@ components:
       example:
         id: 40
         username: "Lionel"
+        password: "123456780"
         email: "unemail@gmail.com"
         phone: "+33754871209"
     Payments:
       type: object
       properties:
-        id: 
+        id:
           type: integer
           format: int64
           description: Id unique du paiement
@@ -1178,6 +1166,33 @@ components:
             currency: "Yen"
             method: "credit_card"
             status: "success"
+        totalItems: 1
+        totalPages: 1
+        currentPage: 1
+
+    PaginatedSubscriptions:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subscription'
+        totalItems:
+          type: integer
+          description: Nombre total d'abonnements
+        totalPages:
+          type: integer
+          description: Nombre total de pages
+        currentPage:
+          type: integer
+          description: Numéro de la page actuelle
+      example:
+        items:
+          - id: 2
+            userId: 13
+            startDate: "2017-01-01"
+            endDate:  "2017-04-01"
+            status: active
         totalItems: 1
         totalPages: 1
         currentPage: 1
