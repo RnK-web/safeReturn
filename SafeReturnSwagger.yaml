@@ -183,6 +183,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PaginatedDeclarations'
+        '401':
+          description: Non autorisé
         '404':
           description: Aucune déclaration trouvée
 
@@ -209,6 +211,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Declarations'
+        '401':
+          description: Non autorisé
         '404':
           description: Déclaration non trouvée
     delete:
@@ -334,6 +338,8 @@ paths:
                 $ref: '#/components/schemas/Declarations'
         '400':
           description: Données invalides
+        '401':
+          description: Non autorisé
         '404':
           description: Déclaration non trouvée
   /v1/users:
@@ -343,8 +349,6 @@ paths:
       summary: Créer un profil utilisateur
       description: Enregistrement d'un utilisateur dans l'application.
       operationId: createUser
-      security:
-        - bearerAuth: []
       requestBody:
         description: Détails de l'utilisateur
         required: true
@@ -428,7 +432,7 @@ paths:
         '404':
           description: Aucun utilisateur trouvé
         '401':
-          description: Utilisateur non vérifié
+          description: Non autorisé
 
   /v1/users/{id}:
     get:
@@ -472,6 +476,8 @@ paths:
                 username: "Lionel"
                 email: "unemail@gmail.com"
                 phone: "+33754871209"
+        '401':
+          description: Non autorisé
         '404':
           description: Utilisateur non trouvé
     delete:
@@ -561,6 +567,8 @@ paths:
                 phone: "+33754871209"
         '400':
           description: Données invalides
+        '401':
+          description: Non autorisé
         '404':
           description: Utilisateur non trouvé
   /v1/users/login:
@@ -689,6 +697,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Payments'
+        '401':
+          description: Non autorisé
         '404':
           description: Paiement non trouvé
     delete:
@@ -796,6 +806,8 @@ paths:
                   status: "success"
         '400':
           description: Données invalides
+        '401':
+          description: Non autorisé
         '404':
           description: Paiement non trouvé
 
