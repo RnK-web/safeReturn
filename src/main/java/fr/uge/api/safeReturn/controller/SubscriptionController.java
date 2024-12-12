@@ -15,28 +15,28 @@ public class SubscriptionController {
     private final HashMap<Long, Subscription> subscriptionStore = new HashMap<>();
 
     @PostMapping("/v1/subscriptions")
-    public Payment createPayment(@RequestBody Payment payment) {
+    public Subscription createPayment(@RequestBody Subscription subscription) {
         return null;
     }
 
     @GetMapping("/v1/subscriptions")
-    public PaginatedItems<Payment> getPayments(@RequestParam(name = "page", required = false) String page) {
+    public PaginatedItems<Subscription> getSubscriptions(@RequestParam(name = "page", required = false) String page) {
         return null;
     }
 
     @GetMapping("/v1/subscriptions/{id}")
-    public Payment getPaymentById(@PathVariable long id) {
+    public Subscription getSubscriptionById(@PathVariable long id) {
         return null;
     }
 
     @DeleteMapping("/v1/subscriptions/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
-    public void deletePaymentById(@PathVariable long id) {
+    public void deleteSubscriptionById(@PathVariable long id) {
 
     }
 
     @PatchMapping("/v1/subscriptions/{id}")
-    public Payment updatePayment(@PathVariable long id, @RequestBody Payment updateValues) {
+    public Subscription updateSubscription(@PathVariable long id, @RequestBody Subscription updateValues) {
         return null;
     }
 
