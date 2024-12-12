@@ -3,12 +3,20 @@ package fr.uge.api.safeReturn.controller;
 import fr.uge.api.safeReturn.model.PaginatedItems;
 import fr.uge.api.safeReturn.model.Payment;
 import fr.uge.api.safeReturn.model.Subscription;
+import fr.uge.api.safeReturn.model.SubscriptionRequest;
 import fr.uge.api.safeReturn.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.sql.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
 import java.util.HashMap;
 
 @RestController
@@ -21,8 +29,22 @@ public class SubscriptionController {
     private UserService userService;
 
     @PostMapping("/v1/subscriptions")
-    public Subscription createPayment(@RequestBody Subscription subscription) {
-        var createdSubscription = new Subscription(nextSubscriptionId, subscription.userId(), subscription.startDate(), subscription.endDate(), subscription.status());
+    @ResponseStatus(value = HttpStatus.CREATED)
+    public Subscription createSubscriptions(@RequestBody SubscriptionRequest subscription, @RequestHeader("Authorization") String authorizationHeader) {
+	    	if (!userService.isValidToken(authorizationHeader)) {
+	        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid token");
+	    	}
+
+
+	      Instant now = Instant.now();
+
+	      // convert Instant to ZonedDateTime
+	      DateTimeFormatter dtf = DateTimeFormatter.ofPattern("uuuu/MM/dd");
+	      ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(now, ZoneId.systemDefault());
+	      var startDate = dtf.format(zonedDateTime);
+	      var endDate = dtf.format( zonedDateTime.plusMonths(subscription.subscriptionDuration()));
+
+        var createdSubscription = new Subscription(nextSubscriptionId, subscription.userId(), startDate, endDate, "active");
         subscriptionStore.put(nextSubscriptionId, createdSubscription);
         nextSubscriptionId++;
         return createdSubscription;

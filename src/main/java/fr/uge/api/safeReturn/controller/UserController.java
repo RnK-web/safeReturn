@@ -7,9 +7,11 @@ import java.util.Map;
 
 import fr.uge.api.safeReturn.model.PaginatedItems;
 import fr.uge.api.safeReturn.model.Payment;
+import fr.uge.api.safeReturn.model.Token;
 import fr.uge.api.safeReturn.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -74,7 +76,8 @@ public class UserController {
 	}
 
 	@PostMapping("/v1/users")
-	public ResponseEntity < Map < String, Object >> registerUser(
+	@ResponseStatus(value = HttpStatus.CREATED)
+	public UserInfos registerUser(
 			@RequestBody Map < String, String > payload) {
 
 		String username = payload.get("username");
@@ -85,26 +88,18 @@ public class UserController {
 		Map < String, Object > response = new LinkedHashMap < > ();
 
 		var registered = userService.registerUser(username, password, email, phone);
-
-		if (registered != null) {
-			response.put("id", registered.id());
-			response.put("username", registered.username());
-			response.put("email", registered.email());
-			response.put("phone", registered.phone());
-			return ResponseEntity.ok(response);
-		} else {
-			return ResponseEntity.badRequest().body(response);
+		if (registered == null) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid data");
 		}
+		return new UserInfos(registered.id(), registered.username(), registered.email(), registered.phone());
 	}
 
 	@PostMapping("/v1/users/login")
-	public ResponseEntity < Map < String, Object >> loginUser(
+	public Token loginUser(
 			@RequestBody Map < String, String > payload) {
 
 		String username = payload.get("username");
 		String password = payload.get("password");
-
-		Map < String, Object > response = new HashMap < > ();
 
 		String token = userService.loginUser(username, password);
 
@@ -112,9 +107,8 @@ public class UserController {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "invalid username or password");
 
 		}
-		response.put("token", token);
 		userService.addToken(token);
-		return ResponseEntity.ok(response);
+		return new Token(token);
 	}
 
 	@PatchMapping("/v1/users/{id}")
@@ -125,6 +119,9 @@ public class UserController {
 		}
 		Map < String, Object > response = new LinkedHashMap < > ();
 		var previousUser = userService.getUserById(id);
+		if (previousUser == null) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id {" + id + "} not found !");
+		}
 
 		String username = payload.get("username") == null ? previousUser.username() : payload.get("username");
 		String password = previousUser.password();
@@ -148,7 +145,10 @@ public class UserController {
 		if (!userService.isValidToken(authorizationHeader)) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "invalid token");
 		}
-		userService.deleteUserById(id);
+		var resp = userService.deleteUserById(id);
+		if (resp == null) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with id {" + id + "} not found !");
+		}
 	}
 
 }
