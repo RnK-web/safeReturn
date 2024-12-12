@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import fr.uge.api.safeReturn.model.Declaration;
-import fr.uge.api.safeReturn.model.PaginatedDeclaration;
+import fr.uge.api.safeReturn.model.PaginatedItems;
 
 @RestController
 public class DeclarationController {
@@ -26,13 +26,13 @@ public class DeclarationController {
 	}
 	
 	@GetMapping("/v1/declarations")
-	public PaginatedDeclaration getDeclarations(@RequestParam(name = "page", required = false) String page) {
+	public PaginatedItems<Declaration> getDeclarations(@RequestParam(name = "page", required = false) String page) {
 		if (declarationStore.isEmpty()) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No declarations were found !");
 		}
 		if (page == null) {
 			var declas = declarationStore.values().stream().toList();
-			return new PaginatedDeclaration(declas, declas.size(), 1, 1);
+			return new PaginatedItems<Declaration>(declas, declas.size(), 1, 1);
 		}
 		int pageNum;
 		try {
@@ -49,7 +49,7 @@ public class DeclarationController {
 			var currentPage = pageNum;
 			var toIndex = Math.min((pageNum + 1) * PAGE_SIZE, declarationStore.size());
 			var declas = declarationStore.values().stream().toList().subList(pageNum * PAGE_SIZE, toIndex);
-			return new PaginatedDeclaration(declas, totalItems, totalPages, currentPage);
+			return new PaginatedItems<Declaration>(declas, totalItems, totalPages, currentPage);
 		} catch (Exception e) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Page is not a valid number");
 		}

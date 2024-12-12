@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public record Payment (
-
+	 long id,
 	 long rewarderId,
 	 long receiverId,
 	 long correlationId,
