@@ -5,6 +5,7 @@ import fr.uge.api.safeReturn.model.Payment;
 import fr.uge.api.safeReturn.model.Subscription;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.HashMap;
 
@@ -16,7 +17,10 @@ public class SubscriptionController {
 
     @PostMapping("/v1/subscriptions")
     public Subscription createPayment(@RequestBody Subscription subscription) {
-        return null;
+        var createdSubscription = new Subscription(nextSubscriptionId, subscription.userId(), subscription.startDate(), subscription.endDate(), subscription.status());
+        subscriptionStore.put(nextSubscriptionId, createdSubscription);
+        nextSubscriptionId++;
+        return createdSubscription;
     }
 
     @GetMapping("/v1/subscriptions")
@@ -32,7 +36,9 @@ public class SubscriptionController {
     @DeleteMapping("/v1/subscriptions/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void deleteSubscriptionById(@PathVariable long id) {
-
+        if (subscriptionStore.remove(id) == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment with id {" + id + "} not found !");
+        }
     }
 
     @PatchMapping("/v1/subscriptions/{id}")
