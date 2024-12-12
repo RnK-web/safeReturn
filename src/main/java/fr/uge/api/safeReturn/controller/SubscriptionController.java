@@ -1,6 +1,7 @@
 package fr.uge.api.safeReturn.controller;
 
 import fr.uge.api.safeReturn.model.PaginatedItems;
+import fr.uge.api.safeReturn.model.Payment;
 import fr.uge.api.safeReturn.model.Subscription;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -29,20 +30,32 @@ public class SubscriptionController {
 
     @GetMapping("/v1/subscriptions/{id}")
     public Subscription getSubscriptionById(@PathVariable long id) {
-        return null;
+        var subscription = subscriptionStore.get(id);
+        if (subscription == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription with id {" + id + "} not found !");
+        }
+        return subscription;
     }
 
     @DeleteMapping("/v1/subscriptions/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void deleteSubscriptionById(@PathVariable long id) {
         if (subscriptionStore.remove(id) == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment with id {" + id + "} not found !");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Subscription with id {" + id + "} not found !");
         }
     }
 
     @PatchMapping("/v1/subscriptions/{id}")
     public Subscription updateSubscription(@PathVariable long id, @RequestBody Subscription updateValues) {
-        return null;
+        var previousSubscription = subscriptionStore.get(id);
+        if (previousSubscription == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment with id {" + id + "} not found !");
+        }
+
+        var status = updateValues.status() == null ? previousSubscription.status() : updateValues.status();
+        var patchedSubscription = new Subscription(previousSubscription.id(), previousSubscription.userId(), previousSubscription.startDate(), previousSubscription.endDate(), status);
+        subscriptionStore.replace(id, patchedSubscription);
+        return patchedSubscription;
     }
 
 
