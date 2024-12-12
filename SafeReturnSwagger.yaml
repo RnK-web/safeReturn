@@ -655,6 +655,8 @@ paths:
       summary: Historique des paiements
       description: Récupère la liste des paiements effectués par les utilisateurs. La récupération en mode pagination est disponible grâce au paramètre "page". Si le paramètre page n'est pas renseigné alors la réponse contiendra l'ensemble des paiements, sinon la réponse contiendra un paquet de 50 paiements.
       operationId: listPayments
+      security:
+        - bearerAuth: []
       parameters:
         - name: page
           in: query
@@ -671,6 +673,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/PaginatedPayments'
+        '401':
+          description: Non autorisé
         '404':
           description: Aucun paiement trouvé
   /v1/payments/{id}:
@@ -818,6 +822,8 @@ paths:
       summary: Créer un abonnement
       description: Permet de souscrire à un abonnement premium.
       operationId: createSubscription
+      security:
+        - bearerAuth: []
       requestBody:
         description: Détails de l'abonnement
         required: true
@@ -843,6 +849,8 @@ paths:
                 $ref: '#/components/schemas/Subscription'
         '400':
           description: Données invalides
+        '401': 
+          description: Non autorisé
 
     get:
       tags:
@@ -857,6 +865,8 @@ paths:
             type: integer
             format: int64
       operationId: listSubscriptions
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Liste des abonnements
@@ -864,6 +874,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedSubscriptions'
+        '401': 
+          description: Non autorisé
         '404':
           description: Aucun abonnement trouvé
 
@@ -874,6 +886,8 @@ paths:
       summary: Obtenir un abonnement
       description: Récupère les détails d'un abonnement spécifique.
       operationId: getSubscriptionById
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -887,6 +901,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Subscription'
+        '401': 
+          description: Non autorisé
         '404':
           description: Abonnement non trouvé
 
@@ -897,6 +913,8 @@ paths:
       summary: Mettre à jour un abonnement
       description: Met à jour les informations d'un abonnement existant.
       operationId: updateSubscription
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -923,6 +941,8 @@ paths:
                 $ref: '#/components/schemas/Subscription'
         '400':
           description: Données invalides
+        '401': 
+          description: Non autorisé
         '404':
           description: Abonnement non trouvé
 
@@ -932,6 +952,8 @@ paths:
       summary: Annuler un abonnement
       description: Annule un abonnement existant.
       operationId: deleteSubscription
+      security:
+        - bearerAuth: []
       parameters:
         - name: id
           in: path
@@ -941,6 +963,8 @@ paths:
       responses:
         '204':
           description: Abonnement annulé avec succès
+        '401': 
+          description: Non autorisé
         '404':
           description: Abonnement non trouvé
 
