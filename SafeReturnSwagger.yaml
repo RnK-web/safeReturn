@@ -355,12 +355,16 @@ paths:
               properties:
                 username:
                   type: string
-                email:
-                  type: string
-                phone:
-                  type: string
+                  description: Nom de profil de l'utilisateur
                 password:
                   type: string
+                  description: mot de passe de l'utilisateur
+                email:
+                  type: string
+                  description: Email de l'utilisateur
+                phone:
+                  type: string
+                  description: Numéro de téléphone de l'utilisateur. Doit respecter le format suivant, +33XXXXXXXXX en adaptant +33 avec le numéro associé à votre pays
               example:
                 username: "Lionel"
                 password: "123456780"
@@ -373,7 +377,26 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Users'
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    description: Id unique de l'utilisateur
+                  username:
+                    type: string
+                    description: Nom de profil de l'utilisateur
+                  email:
+                    type: string
+                    description: Email de l'utilisateur
+                  phone:
+                    type: string
+                    description: Numéro de téléphone de l'utilisateur. Doit respecter le format suivant, +33XXXXXXXXX en adaptant +33 avec le numéro associé à votre pays
+              example:
+                id: 40
+                username: "Lionel"
+                email: "unemail@gmail.com"
+                phone: "+33754871209"
 
         '400':
           description: Données utilisateur invalides
@@ -429,7 +452,26 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Users'
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    description: Id unique de l'utilisateur
+                  username:
+                    type: string
+                    description: Nom de profil de l'utilisateur
+                  email:
+                    type: string
+                    description: Email de l'utilisateur
+                  phone:
+                    type: string
+                    description: Numéro de téléphone de l'utilisateur. Doit respecter le format suivant, +33XXXXXXXXX en adaptant +33 avec le numéro associé à votre pays
+              example:
+                id: 40
+                username: "Lionel"
+                email: "unemail@gmail.com"
+                phone: "+33754871209"
         '404':
           description: Utilisateur non trouvé
     delete:
@@ -479,11 +521,14 @@ paths:
               type: object
               properties:
                 username:
-                  type: string
+                    type: string
+                    description: Nom de profil de l'utilisateur
                 email:
                   type: string
+                  description: Email de l'utilisateur
                 phone:
                   type: string
+                  description: Numéro de téléphone de l'utilisateur. Doit respecter le format suivant, +33XXXXXXXXX en adaptant +33 avec le numéro associé à votre pays
               example:
                 username: "Lionel"
                 email: "unemail@gmail.com"
@@ -494,7 +539,26 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Users'
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    format: int64
+                    description: Id unique de l'utilisateur
+                  username:
+                    type: string
+                    description: Nom de profil de l'utilisateur
+                  email:
+                    type: string
+                    description: Email de l'utilisateur
+                  phone:
+                    type: string
+                    description: Numéro de téléphone de l'utilisateur. Doit respecter le format suivant, +33XXXXXXXXX en adaptant +33 avec le numéro associé à votre pays
+              example:
+                id: 40
+                username: "Lionel"
+                email: "unemail@gmail.com"
+                phone: "+33754871209"
         '400':
           description: Données invalides
         '404':
@@ -1110,8 +1174,8 @@ components:
             reward: 60
             status: "active"
         totalItems: 1
-        totalPages: 1
-        currentPage: 1
+        totalPages: 0
+        currentPage: 0
 
 
     PaginatedUsers:
@@ -1120,7 +1184,21 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/Users'
+            type: object
+            properties:
+              id:
+                type: integer
+                format: int64
+                description: Id unique de l'utilisateur
+              username:
+                type: string
+                description: Nom de profil de l'utilisateur
+              email:
+                type: string
+                description: Email de l'utilisateur
+              phone:
+                type: string
+                description: Numéro de téléphone de l'utilisateur. Doit respecter le format suivant, +33XXXXXXXXX en adaptant +33 avec le numéro associé à votre pays
         totalItems:
           type: integer
           description: Nombre total d'utilisateurs
@@ -1137,8 +1215,8 @@ components:
             email: "unemail@gmail.com"
             phone: "+33754871209"
         totalItems: 1
-        totalPages: 1
-        currentPage: 1
+        totalPages: 0
+        currentPage: 0
 
     PaginatedPayments:
       type: object
@@ -1167,8 +1245,8 @@ components:
             method: "credit_card"
             status: "success"
         totalItems: 1
-        totalPages: 1
-        currentPage: 1
+        totalPages: 0
+        currentPage: 0
 
     PaginatedSubscriptions:
       type: object
@@ -1194,6 +1272,6 @@ components:
             endDate:  "2017-04-01"
             status: active
         totalItems: 1
-        totalPages: 1
-        currentPage: 1
+        totalPages: 0
+        currentPage: 0
 
