@@ -39,7 +39,7 @@ public class SubscriptionController {
 	      Instant now = Instant.now();
 
 	      // convert Instant to ZonedDateTime
-	      DateTimeFormatter dtf = DateTimeFormatter.ofPattern("uuuu/MM/dd");
+	      DateTimeFormatter dtf = DateTimeFormatter.ofPattern("uuuu-MM-dd");
 	      ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(now, ZoneId.systemDefault());
 	      var startDate = dtf.format(zonedDateTime);
 	      var endDate = dtf.format( zonedDateTime.plusMonths(subscription.subscriptionDuration()));
