@@ -2,6 +2,7 @@ package fr.uge.api.safeReturn.controller;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -65,6 +66,7 @@ public class PaymentController {
 	}
 
 	@DeleteMapping("/v1/payments/{id}")
+	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void deletePaymentById(@PathVariable long id) {
 		var removedPayment = paymentStore.remove(id);
 		if (removedPayment == null) {
@@ -73,12 +75,16 @@ public class PaymentController {
 	}
 
 	@PatchMapping("/v1/payments/{id}")
-	public Payment updatePayment(@PathVariable long id, @RequestBody Payment payment) {
+	public Payment updatePayment(@PathVariable long id, @RequestBody Payment updateValues) {
 		var previousPayment = paymentStore.get(id);
 		if (previousPayment == null) {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Payment with id {" + id + "} not found !");
 		}
-		var patchedPayment = new Payment(id, previousPayment.rewarderId(), previousPayment.receiverId(), previousPayment.correlationId(), payment.amount(), payment.currency(), payment.method(), payment.status());
+		var amount = updateValues.amount() == null ? previousPayment.amount() : updateValues.amount();
+		var currency = updateValues.currency() == null ? previousPayment.currency() : updateValues.currency();
+		var method = updateValues.method() == null ? previousPayment.method() : updateValues.method();
+		var status = updateValues.status() == null ? previousPayment.status() : updateValues.status();
+		var patchedPayment = new Payment(id, previousPayment.rewarderId(), previousPayment.receiverId(), previousPayment.correlationId(), amount, currency, method, status);
 		paymentStore.replace(id, patchedPayment);
 		return patchedPayment;
 	}

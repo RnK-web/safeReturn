@@ -9,12 +9,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public record Payment (
-	 long id,
-	 long rewarderId,
-	 long receiverId,
-	 long correlationId,
+	 Long id,
+	 Long rewarderId,
+	 Long receiverId,
+	 Long correlationId,
 	
-	 float amount,
+	 Float amount,
 	 String currency,
 	 String method,
 	 String status

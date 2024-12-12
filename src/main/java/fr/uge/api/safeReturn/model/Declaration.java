@@ -8,12 +8,12 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public record Declaration(long id,
+public record Declaration(Long id,
 	
 	 String type,
 	 AnimalDetails animalDetails,
 	 Location location,
 	 String photo,
-	 int reward,
+	 Integer reward,
 	 String status
 	) {}
