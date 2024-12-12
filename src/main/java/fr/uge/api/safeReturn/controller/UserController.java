@@ -142,6 +142,7 @@ public class UserController {
 	}
 
 	@DeleteMapping("/v1/users/{id}")
+	@ResponseStatus(value = HttpStatus.NO_CONTENT)
 	public void deleteUserById(@PathVariable long id, @RequestHeader("Authorization") String authorizationHeader) {
 
 		if (!userService.isValidToken(authorizationHeader)) {
